@@ -30,6 +30,9 @@ import Foundation
 
 struct Api {
     
+    private static var phoneNumber: String = "";
+    private static let defaultResponse: [String: Any]? = ["status": "ok"]
+    
     struct ApiError: Error {
         var message: String
         var code: String
@@ -79,6 +82,19 @@ struct Api {
                 }
             }
         }.resume()
+    }
+    
+    static func testSendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {
+        self.phoneNumber = phoneNumber
+        DispatchQueue.main.async { completion(defaultResponse, nil) }
+    }
+    
+    static func testVerifyCode(phoneNumber: String, code: String, completion: @escaping ApiCompletion) {
+        if phoneNumber == self.phoneNumber && code == "123456" {
+            DispatchQueue.main.async { completion(defaultResponse, nil) }
+        } else {
+            DispatchQueue.main.async { completion(nil, defaultError) }
+        }
     }
     
     static func sendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {

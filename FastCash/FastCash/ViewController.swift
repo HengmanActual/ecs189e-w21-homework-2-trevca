@@ -48,11 +48,12 @@ class ViewController: UIViewController {
 
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(identifier: "verification")
-                let verificationVC = vc as! VerificationViewController
+                guard let verificationVC = vc as? VerificationViewController else {
+                    assertionFailure("couldn't find vc")
+                    return
+                }
                 verificationVC.setPhoneNumber(num: self.phoneNumber_e164)
-                print("here")
                 self.navigationController?.pushViewController(verificationVC, animated: true)
-                print("here")
                 
             })
             errorLabel.textColor = UIColor.black

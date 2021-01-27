@@ -16,6 +16,9 @@ class VerificationViewController: UIViewController {
     @IBOutlet weak var OTP4: UITextField!
     @IBOutlet weak var OTP5: UITextField!
     @IBOutlet weak var OTP6: UITextField!
+    @IBOutlet weak var ErrorLabel: UILabel!
+    
+    @IBOutlet weak var sentToNumber: UILabel!
     
     var fields: [UITextField?] = []
     var phoneNum: String = ""
@@ -31,6 +34,7 @@ class VerificationViewController: UIViewController {
         self.fields.append(OTP6)
         self.currentField = 0
         OTP1.becomeFirstResponder()
+        sentToNumber.text? = "Code was sent to \(self.phoneNum)"
         // Do any additional setup after loading the view.
     }
     
@@ -46,9 +50,19 @@ class VerificationViewController: UIViewController {
         return code
     }
     
+    func clearCodes() {
+        for OTP in self.fields {
+            OTP?.text = ""
+        }
+        self.OTP1.becomeFirstResponder()
+        self.currentField = 0
+    }
+    
     @IBAction func editedField(_ sender: Any) {
         print("edited")
         print(self.currentField)
+        
+        // extra if to help with OTP
         if self.currentField == 0 {
             let text = self.OTP1.text ?? ""
             if(text.count == 0) {
@@ -56,30 +70,61 @@ class VerificationViewController: UIViewController {
             }
         }
         if self.currentField == 5 {
-            print("verifying")
-            Api.verifyCode(phoneNumber: self.phoneNum, code: concatenateCode(), completion: {
-                response,error in
-                if error == nil {
-                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                    let vc = storyboard.instantiateViewController(identifier: "home")
-                    let homeVC = vc as! HomeViewController
+            let text = self.OTP5.text ?? ""
+            if(text.count == 0) {
+                self.currentField -= 1
+                self.fields[currentField]?.becomeFirstResponder()
+            } else {
+                print("verifying")
+                Api.verifyCode(phoneNumber: self.phoneNum, code: concatenateCode(), completion: {
+                    response,error in
+                    if error == nil {
+                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                        let vc = storyboard.instantiateViewController(identifier: "home")
+                        guard let homeVC = vc as? HomeViewController else {
+                            assertionFailure("couldn't find vc")
+                            return
+                        }
 
-                    self.navigationController?.present(homeVC, animated: true)
-                }
-                else {
-                    print(error)
-                }
-                
-            })
+                        self.navigationController?.present(homeVC, animated: true)
+                    }
+                    else {
+                        self.clearCodes()
+                        self.ErrorLabel.text = error?.message
+                        self.ErrorLabel.textColor = .systemRed
+                    }
+                    
+                })
+            }
+            
+            
         }
         else {
             // go to next
-            self.currentField = self.currentField+1
-            self.fields[currentField]?.becomeFirstResponder()
+            let text = self.fields[currentField]?.text ?? ""
+            if(text.count == 0 && currentField > 0) {
+                self.currentField -= 1
+                self.fields[currentField]?.becomeFirstResponder()
+            } else {
+                self.currentField += 1
+                self.fields[currentField]?.becomeFirstResponder()
+            }
         }
     }
     
     
+    @IBAction func resendCode(_ sender: Any) {
+        Api.sendVerificationCode(phoneNumber: self.phoneNum, completion: { response, error in
+            if let _ = response {
+                self.ErrorLabel.text = ""
+                self.ErrorLabel.textColor = .black
+            }
+            if let err = error {
+                self.ErrorLabel.text = err.message
+                self.ErrorLabel.textColor = .systemRed
+            }
+        })
+    }
     
     
     
