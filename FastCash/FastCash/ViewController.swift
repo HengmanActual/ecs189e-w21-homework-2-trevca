@@ -52,7 +52,7 @@ class ViewController: UIViewController {
                     assertionFailure("couldn't find vc")
                     return
                 }
-                verificationVC.setPhoneNumber(num: self.phoneNumber_e164)
+                verificationVC.phoneNum = self.phoneNumber_e164
                 self.navigationController?.pushViewController(verificationVC, animated: true)
                 
             })

@@ -20,98 +20,79 @@ class VerificationViewController: UIViewController {
     
     @IBOutlet weak var sentToNumber: UILabel!
     
-    var fields: [UITextField?] = []
+    var fields: [UITextField] = []
     var phoneNum: String = ""
     var currentField = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         self.fields.append(OTP1)
         self.fields.append(OTP2)
         self.fields.append(OTP3)
         self.fields.append(OTP4)
         self.fields.append(OTP5)
         self.fields.append(OTP6)
+        
         self.currentField = 0
         OTP1.becomeFirstResponder()
-        sentToNumber.text? = "Code was sent to \(self.phoneNum)"
-        // Do any additional setup after loading the view.
-    }
-    
-    func setPhoneNumber(num: String) {
-        self.phoneNum = num
-    }
-    
-    func concatenateCode()-> String {
-        var code = ""
-        for field in self.fields {
-            code.append(field?.text ?? "")
-        }
-        return code
+        sentToNumber.text = "Code was sent to \(self.phoneNum)"
     }
     
     func clearCodes() {
-        for OTP in self.fields {
-            OTP?.text = ""
-        }
-        self.OTP1.becomeFirstResponder()
+        self.fields = self.fields.map({ $0.text = ""; return $0})
+        self.fields[0].becomeFirstResponder()
         self.currentField = 0
     }
     
     @IBAction func editedField(_ sender: Any) {
-        print("edited")
-        print(self.currentField)
         
-        // extra if to help with OTP
-        if self.currentField == 0 {
-            let text = self.OTP1.text ?? ""
-            if(text.count == 0) {
-                return
+        let text = self.fields[self.currentField].text ?? ""
+        
+        // solve for auotfill
+        if text.count == 0 {
+            return
+        }
+        
+        // solve for pasting code into the first field
+        if text.count > 1 && self.currentField == 0 {
+            for (field, index) in zip(self.fields, 1...6) {
+                if index > text.count {
+                    self.fields[self.currentField+1].becomeFirstResponder()
+                    return
+                }
+                field.text = String(text[text.index(text.startIndex, offsetBy: index-1)])
+                self.currentField = index-1
             }
         }
+        
         if self.currentField == 5 {
-            let text = self.OTP5.text ?? ""
-            if(text.count == 0) {
-                self.currentField -= 1
-                self.fields[currentField]?.becomeFirstResponder()
-            } else {
-                print("verifying")
-                Api.verifyCode(phoneNumber: self.phoneNum, code: concatenateCode(), completion: {
-                    response,error in
-                    if error == nil {
-                        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                        let vc = storyboard.instantiateViewController(identifier: "home")
-                        guard let homeVC = vc as? HomeViewController else {
-                            assertionFailure("couldn't find vc")
-                            return
-                        }
-
-                        self.navigationController?.present(homeVC, animated: true)
-                    }
-                    else {
-                        self.clearCodes()
-                        self.ErrorLabel.text = error?.message
-                        self.ErrorLabel.textColor = .systemRed
-                    }
+            Api.verifyCode(phoneNumber: self.phoneNum,
+                           code: self.fields.compactMap({$0.text}).reduce("", {$0 + $1}),
+                           completion: { response, error in
+                if error == nil {
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let vc = storyboard.instantiateViewController(identifier: "home")
                     
-                })
-            }
-            
-            
+                    guard let homeVC = vc as? HomeViewController else {
+                        assertionFailure("couldn't find vc")
+                        return
+                    }
+                    self.navigationController?.present(homeVC, animated: true)
+                }
+                else {
+                    self.clearCodes()
+                    self.ErrorLabel.text = error?.message
+                    self.ErrorLabel.textColor = .systemRed
+                }
+            })
         }
         else {
             // go to next
-            let text = self.fields[currentField]?.text ?? ""
-            if(text.count == 0 && currentField > 0) {
-                self.currentField -= 1
-                self.fields[currentField]?.becomeFirstResponder()
-            } else {
-                self.currentField += 1
-                self.fields[currentField]?.becomeFirstResponder()
-            }
+            self.currentField += 1
+            self.fields[currentField].becomeFirstResponder()
         }
     }
-    
     
     @IBAction func resendCode(_ sender: Any) {
         Api.sendVerificationCode(phoneNumber: self.phoneNum, completion: { response, error in
@@ -125,18 +106,5 @@ class VerificationViewController: UIViewController {
             }
         })
     }
-    
-    
-    
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
