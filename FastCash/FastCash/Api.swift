@@ -84,12 +84,12 @@ struct Api {
         }.resume()
     }
     
-    static func testSendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {
+    static func sendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {
         self.phoneNumber = phoneNumber
         DispatchQueue.main.async { completion(defaultResponse, nil) }
     }
     
-    static func testVerifyCode(phoneNumber: String, code: String, completion: @escaping ApiCompletion) {
+    static func verifyCode(phoneNumber: String, code: String, completion: @escaping ApiCompletion) {
         if phoneNumber == self.phoneNumber && code == "123456" {
             DispatchQueue.main.async { completion(defaultResponse, nil) }
         } else {
@@ -97,13 +97,13 @@ struct Api {
         }
     }
     
-    static func sendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {
+    static func tsendVerificationCode(phoneNumber: String, completion: @escaping ApiCompletion) {
         ApiCall(endpoint: "/send_verification_code",
                 parameters: ["phone_number": phoneNumber],
                 completion: completion)
     }
     
-    static func verifyCode(phoneNumber: String, code: String, completion: @escaping ApiCompletion) {
+    static func tverifyCode(phoneNumber: String, code: String, completion: @escaping ApiCompletion) {
         ApiCall(endpoint: "/verify_code",
                 parameters: ["e164_phone_number": phoneNumber, "code": code],
                 completion: completion)

@@ -26,7 +26,6 @@ class VerificationViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.fields.append(OTP1)
         self.fields.append(OTP2)
         self.fields.append(OTP3)
@@ -36,11 +35,19 @@ class VerificationViewController: UIViewController {
         
         self.currentField = 0
         OTP1.becomeFirstResponder()
+        OTP2.isUserInteractionEnabled = false
+        OTP3.isUserInteractionEnabled = false
+        OTP4.isUserInteractionEnabled = false
+        OTP5.isUserInteractionEnabled = false
+        OTP6.isUserInteractionEnabled = false
+        
         sentToNumber.text = "Code was sent to \(self.phoneNum)"
     }
     
     func clearCodes() {
         self.fields = self.fields.map({ $0.text = ""; return $0})
+        self.fields[self.currentField].isUserInteractionEnabled = false
+        self.fields[0].isUserInteractionEnabled = true
         self.fields[0].becomeFirstResponder()
         self.currentField = 0
     }
@@ -63,6 +70,7 @@ class VerificationViewController: UIViewController {
                 }
                 field.text = String(text[text.index(text.startIndex, offsetBy: index-1)])
                 self.currentField = index-1
+                
             }
         }
         
@@ -89,8 +97,11 @@ class VerificationViewController: UIViewController {
         }
         else {
             // go to next
+            self.fields[currentField].isUserInteractionEnabled = false
             self.currentField += 1
+            self.fields[currentField].isUserInteractionEnabled = true
             self.fields[currentField].becomeFirstResponder()
+            
         }
     }
     
