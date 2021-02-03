@@ -50,8 +50,10 @@ class ViewController: UIViewController {
                 guard let _ = response else {
                     if let err = error {
                         self.errorLabel.text = err.message
-                        self.errorLabel.textColor = UIColor.systemRed
+                    } else {
+                        self.errorLabel.text = "Unknown error"
                     }
+                    self.errorLabel.textColor = UIColor.systemRed
                     self.playView()
                     return
                 }
