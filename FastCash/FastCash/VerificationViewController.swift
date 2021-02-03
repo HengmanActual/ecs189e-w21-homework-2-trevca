@@ -81,12 +81,11 @@ class VerificationViewController: UIViewController {
                 if error == nil {
                     let storyboard = UIStoryboard(name: "Main", bundle: nil)
                     let vc = storyboard.instantiateViewController(identifier: "home")
-                    
-                    guard let homeVC = vc as? HomeViewController else {
-                        assertionFailure("couldn't find vc")
+                    guard let navC = self.navigationController else {
+                        assertionFailure("couldn't find nav")
                         return
                     }
-                    self.navigationController?.present(homeVC, animated: true)
+                    navC.setViewControllers([vc], animated: true)
                 }
                 else {
                     self.clearCodes()

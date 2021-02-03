@@ -102,11 +102,16 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="TIu-ym-kDX">
+                                <rect key="frame" x="188.5" y="429.5" width="37" height="37"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <gestureRecognizers/>
                         <constraints>
+                            <constraint firstItem="TIu-ym-kDX" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="0m5-cN-YMJ"/>
+                            <constraint firstItem="TIu-ym-kDX" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="PM3-66-NYi"/>
                             <constraint firstItem="5zm-nK-YN1" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="80" id="c7t-vV-n57"/>
                             <constraint firstItem="5zm-nK-YN1" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="x8N-ul-qe1"/>
                         </constraints>
@@ -117,6 +122,7 @@
                     <navigationItem key="navigationItem" id="RGr-1T-ePu"/>
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
+                        <outlet property="ActivityIndicator" destination="TIu-ym-kDX" id="sgh-dD-XxN"/>
                         <outlet property="errorLabel" destination="BkK-pW-egh" id="oy7-pB-azG"/>
                         <outlet property="nextButton" destination="97b-CF-KkM" id="A6c-x3-RBX"/>
                         <outlet property="textField" destination="ha2-Zc-MwY" id="JZw-mJ-gLk"/>
