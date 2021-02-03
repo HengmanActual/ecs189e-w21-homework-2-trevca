@@ -47,7 +47,14 @@ class ViewController: UIViewController {
         } else {
             self.stopView()
             Api.sendVerificationCode(phoneNumber: self.phoneNumber_e164, completion: { response, error in
-
+                guard let _ = response else {
+                    if let err = error {
+                        self.errorLabel.text = err.message
+                        self.errorLabel.textColor = UIColor.systemRed
+                    }
+                    self.playView()
+                    return
+                }
                 let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 let vc = storyboard.instantiateViewController(identifier: "verification")
                 guard let verificationVC = vc as? VerificationViewController else {
